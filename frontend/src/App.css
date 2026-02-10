@@ -1,0 +1,83 @@
+body {
+  background: radial-gradient(circle, #0f2027, #203a43, #2c5364);
+  color: white;
+  font-family: Arial, sans-serif;
+}
+/* ===== LOGIN & SIGNUP CENTER FIX ===== */
+
+.auth-page {
+  height: 100vh !important;
+  width: 100vw !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: url('frontend\public\dashboard.jpeg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+.auth-box {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+
+  padding: 30px !important;
+  border-radius: 12px !important;
+
+  width: 420px !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+
+  text-align: center !important;
+}
+
+/* INPUT DESIGN */
+.auth-box input {
+  padding: 14px !important;
+  font-size: 16px !important;
+  border-radius: 8px !important;
+  border: none !important;
+}
+
+/* BUTTON */
+.auth-box button {
+  padding: 14px !important;
+  font-size: 16px !important;
+  border-radius: 8px !important;
+  background: #1db954 !important;
+  color: white !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+/* ===== FORCE FIX FOR VOICE HELP BOARD ===== */
+
+.voice-help,
+.voice-help * {
+  opacity: 1 !important;
+  color: #000000 !important;
+  visibility: visible !important;
+  filter: none !important;
+}
+
+.voice-help {
+  background: #ffffff !important;
+  padding: 15px !important;
+  border-radius: 12px !important;
+  font-weight: 500 !important;
+}
+
+.voice-help h3 {
+  color: #000 !important;
+  font-size: 18px !important;
+}
+
+.voice-help ul li {
+  color: #000 !important;
+  font-size: 15px !important;
+  opacity: 1 !important;
+}
+
