@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, redirect, send_from_directory
 from flask_cors import CORS
-from backend.models import db, User, Song
+from models import db, User, Song
 from backend.player import MusicPlayer 
 from backend.spotify_control import SpotifyController
 import os , sys
