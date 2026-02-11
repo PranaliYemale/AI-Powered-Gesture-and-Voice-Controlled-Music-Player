@@ -1,0 +1,145 @@
+body {
+  background: url("C:\Users\jeelm\OneDrive\Desktop\FINAL\frontend\public\dashboard.jpeg") no-repeat center center fixed;
+  background-size: cover;
+  color: #e5e7eb;
+}
+
+/* opacity effect ke liye overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0, 0, 0, 0.55);   /* 👈 opacity yaha control karo */
+
+  z-index: -1;
+}
+
+
+.auth-page {
+  height: 100vh;
+  width: 100vw;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  position: relative;
+}
+
+.auth-box {
+  background: rgba(0, 0, 0, 0.85);
+
+  padding: 30px;
+  border-radius: 12px;
+
+  width: 420px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  text-align: center;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ===== BIG INPUT BOX ===== */
+.auth-box input {
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  width: 100%;
+}
+
+/* ===== BIG BUTTON ===== */
+.auth-box button {
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  width: 100%;
+  background: #1db954;
+  color: white;
+}
+/* ===== PREMIUM GLASS ===== */
+.glass {
+  background: linear-gradient(
+    145deg,
+    rgba(30,41,59,0.6),
+    rgba(15,23,42,0.8)
+  );
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 0 25px rgba(0,0,0,0.4);
+}
+
+/* Buttons */
+.btn {
+  background: linear-gradient(45deg, #00ff87, #60efff);
+  border: none;
+  padding: 8px 12px;
+  margin: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-red {
+  background: linear-gradient(45deg, #ff416c, #ff4b2b);
+}
+
+.btn:hover {
+  box-shadow: 0 0 14px #8b5cf6;
+}
+
+
+/* ===== SONG LIST ===== */
+
+.song-item {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+  background: #2d3748;
+  transition: all 0.3s;
+}
+
+.song-active {
+  background: linear-gradient(90deg, #00ff87, #60efff);
+  color: black;
+  font-weight: bold;
+  transform: scale(1.02);
+}
+
+.song-item:hover {
+  background: rgba(255,255,255,0.08);
+}
+/* Voice Help White Board Fix */
+.voice-help {
+  background: #ffffff !important;
+  color: black !important;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.voice-help h3 {
+  color: navy !important;
+  font-weight: bold;
+}
+
+.voice-help ul li {
+  color: black !important;
+  font-size: 15px;
+  margin: 6px 0;
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px #8b5cf6; }
+  50% { box-shadow: 0 0 15px #8b5cf6; }
+  100% { box-shadow: 0 0 5px #8b5cf6; }
+}
