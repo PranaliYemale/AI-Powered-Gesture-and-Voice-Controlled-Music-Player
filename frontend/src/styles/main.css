@@ -1,5 +1,8 @@
 body {
-  background: url("frontend\public\dashboard.jpeg") no-repeat center center fixed;
+  background-image: url("../assets/dashboard.jpeg");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
   background-size: cover;
   color: #e5e7eb;
 }
