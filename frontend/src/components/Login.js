@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
-  const [email_or_username, setEmailOrUsername] = useState("");
+  const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
@@ -13,22 +13,24 @@ function Login() {
       const res = await fetch(`${API}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email_or_username, password }),
+        body: JSON.stringify({
+          email_or_username: emailOrUsername,
+          password: password,
+        }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || "Login failed");
+        alert(data.error || "Invalid credentials");
         return;
       }
 
       localStorage.setItem("user_id", data.user_id);
-
       navigate("/dashboard");
 
     } catch (err) {
-      console.error("Login error:", err);
+      console.error(err);
       alert("Backend server not reachable");
     }
   };
@@ -40,7 +42,7 @@ function Login() {
 
         <input
           placeholder="Email or Username"
-          value={email_or_username}
+          value={emailOrUsername}
           onChange={(e) => setEmailOrUsername(e.target.value)}
         />
 
@@ -50,16 +52,6 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-
-        <p>
-          New user?{" "}
-          <span
-            style={{ color: "#6c63ff", cursor: "pointer" }}
-            onClick={() => navigate("/signup")}
-          >
-            Sign Up here
-          </span>
-        </p>
 
         <button onClick={handleLogin}>Login</button>
       </div>

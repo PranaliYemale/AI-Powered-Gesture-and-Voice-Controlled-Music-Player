@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from backend.models import db, User
 from backend.voice_control import start_voice, stop_voice
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 # ---------------- DATABASE ----------------
@@ -94,14 +95,6 @@ def volume_down():
     player.volume_down()
     return jsonify({"volume": player.volume})
 
-@app.route("/api/like", methods=["POST"])
-def like():
-    return jsonify({"message": "liked"})
-
-@app.route("/api/dislike", methods=["POST"])
-def dislike():
-    return jsonify({"message": "disliked"})
-
 # ---------------- STATE ROUTE ----------------
 @app.route("/api/state")
 def get_state():
@@ -129,10 +122,12 @@ def signup():
     ).first():
         return jsonify({"error": "User already exists"}), 400
 
+    hashed_password = generate_password_hash(data["password"])
+
     user = User(
         username=data["username"],
         email=data["email"],
-        password=data["password"]
+        password=hashed_password
     )
 
     db.session.add(user)
@@ -149,10 +144,16 @@ def login():
         (User.username == data["email_or_username"])
     ).first()
 
-    if not user or user.password != data["password"]:
+    if not user:
+        return jsonify({"error": "User not found"}), 401
+
+    if not check_password_hash(user.password, data["password"]):
         return jsonify({"error": "Invalid credentials"}), 401
 
-    return jsonify({"token": str(user.id)})
+    return jsonify({
+        "message": "Login successful",
+        "user_id": user.id
+    })
 
 # ---------------- VOICE ----------------
 @app.route("/api/voice/start", methods=["POST"])
