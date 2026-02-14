@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Signup({ setUserId }) {
+function Signup() {
+
+  const API = process.env.REACT_APP_API_URL;
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,20 +13,18 @@ function Signup({ setUserId }) {
 
   const handleSignup = async () => {
     try {
-      const res = await fetch("api/signup", {
+      const res = await fetch(`${API}/api/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const errorData = await res.json();
-        alert("Signup failed: " + errorData.error);
+        alert("Signup failed: " + (data.error || "Unknown error"));
         return;
       }
-
-      const data = await res.json();
-      console.log("Signup success:", data);
 
       alert("Signup successful! Please login.");
       navigate("/login");
@@ -35,49 +36,47 @@ function Signup({ setUserId }) {
   };
 
   return (
-  <div className="auth-page">
+    <div className="auth-page">
+      <div className="auth-box">
 
-    <div className="auth-box">
+        <h2>Signup</h2>
 
-      <h2>Signup</h2>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
 
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <p>
+          Already have an account?
+          <span
+            style={{ color: "#6c63ff", cursor: "pointer" }}
+            onClick={() => navigate("/login")}
+          >
+            Login here
+          </span>
+        </p>
 
-      <p>
-        Already have an account?
-        <span
-          style={{ color: "#6c63ff", cursor: "pointer" }}
-          onClick={() => navigate("/login")}
-        >
-          Login here
-        </span>
-      </p>
+        <button onClick={handleSignup}>Signup</button>
 
-      <button onClick={handleSignup}>Signup</button>
-
+      </div>
     </div>
-  </div>
-);
-
+  );
 }
 
 export default Signup;

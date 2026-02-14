@@ -25,11 +25,6 @@ function Login() {
 
       localStorage.setItem("user_id", data.user_id);
 
-      // start voice (production safe)
-      await fetch(`${API}/api/voice/start`, {
-        method: "POST",
-      });
-
       navigate("/dashboard");
 
     } catch (err) {

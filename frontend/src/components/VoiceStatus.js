@@ -1,18 +1,24 @@
 import { useEffect, useState } from "react";
 
 export default function VoiceStatus() {
+
+  const API = process.env.REACT_APP_API_URL || "";
+
   const [active, setActive] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch("http://127.0.0.1:5000/api/voice_status")
+
+      fetch(`${API}/api/voice_status`)
         .then(res => res.json())
         .then(data => setActive(data.active))
         .catch(() => {});
+
     }, 1500);
 
     return () => clearInterval(interval);
-  }, []);
+
+  }, [API]);
 
   return (
     <div style={{

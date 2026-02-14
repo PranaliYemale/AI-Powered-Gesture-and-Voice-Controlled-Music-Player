@@ -3,7 +3,7 @@ import { Hands } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
 import axios from "axios";
 
-const API_BASE = "https://your-backend-url/api"; // 🔥 CHANGE THIS
+const API_BASE = process.env.REACT_APP_API_URL + "/api";
 const COOLDOWN = 800;
 
 function GestureControl() {
@@ -42,59 +42,41 @@ function GestureControl() {
         lastActionTime.current = Date.now();
       };
 
-      // OPEN PALM → PLAY
-      if (
-        thumb.y < index.y &&
-        index.y < middle.y &&
-        middle.y < ring.y &&
-        ring.y < pinky.y
-      ) {
+      if (thumb.y < index.y && index.y < middle.y && middle.y < ring.y && ring.y < pinky.y) {
         sendAction("play");
         return;
       }
 
-      // FIST → PAUSE
-      if (
-        thumb.y > index.y &&
-        index.y > middle.y &&
-        middle.y > ring.y &&
-        ring.y > pinky.y
-      ) {
+      if (thumb.y > index.y && index.y > middle.y && middle.y > ring.y && ring.y > pinky.y) {
         sendAction("pause");
         return;
       }
 
-      // NEXT
       if (index.x - wrist.x > 0.25) {
         sendAction("next");
         return;
       }
 
-      // PREVIOUS
       if (index.x - wrist.x < -0.25) {
         sendAction("prev");
         return;
       }
 
-      // VOLUME UP
       if (pinchDist > 0.18) {
         sendAction("volume_up");
         return;
       }
 
-      // VOLUME DOWN
       if (pinchDist < 0.04) {
         sendAction("volume_down");
         return;
       }
 
-      // LIKE
       if (thumb.y < index.y - 0.05) {
         sendAction("like");
         return;
       }
 
-      // DISLIKE
       if (thumb.y > index.y + 0.1) {
         sendAction("dislike");
         return;

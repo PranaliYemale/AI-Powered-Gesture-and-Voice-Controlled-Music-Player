@@ -11,16 +11,13 @@ export default function VoiceHelp() {
         <li>⏸ kiki stop song</li>
         <li>⏭ kiki next song</li>
         <li>⏮ kiki previous song</li>
-        <h4>Spotify Commands</h4>
-        <li>🎧 kiki spotify play</li>
-        <li>❤️ kiki spotify stop</li>
-        <li>❤️ kiki spotify previous song</li>
-        <li>❤️ kiki spotify next song</li>
 
+        <h4>System Commands</h4>
+        <li>🎤 player start listening</li>
         <li>⛔ player stop listening</li>
       </ul>
 
-      <p>💡 Tip: Speak clearly after saying player</p>
+      <p>💡 Tip: Speak clearly after saying kiki</p>
 
     </div>
   );
