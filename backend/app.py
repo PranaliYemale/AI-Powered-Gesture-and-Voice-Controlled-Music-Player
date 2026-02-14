@@ -1,22 +1,13 @@
-from flask import Flask, request, jsonify, redirect, send_from_directory
+from flask import Flask, request, jsonify, redirect
 from flask_cors import CORS
-from backend.models import db, User, Song
-from backend.spotify_control import SpotifyController
-from backend.voice_control import start_voice, stop_voice
+from backend.models import db, User
 import os
-import threading
 
-# ---------------- DATABASE ----------------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database.db")
-FRONTEND_BUILD = os.path.join(BASE_DIR, "..", "frontend", "build")
-
-app = Flask(
-    __name__,
-    static_folder=os.path.join(FRONTEND_BUILD, "static"),
-    template_folder=FRONTEND_BUILD
-)
+app = Flask(__name__)
 CORS(app)
+
+# ✅ SAFE DB PATH FOR RENDER
+DB_PATH = os.path.join("/tmp", "database.db")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -26,80 +17,20 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-# ---------------- MUSIC FOLDER ----------------
-MUSIC_FOLDER = os.path.join(BASE_DIR, "music")
-os.makedirs(MUSIC_FOLDER, exist_ok=True)
+# ---------------- HEALTH ----------------
+@app.route("/")
+def home():
+    return "Backend running 🚀"
 
-local_songs = [
-    os.path.join(MUSIC_FOLDER, f)
-    for f in os.listdir(MUSIC_FOLDER)
-    if f.endswith(".mp3")
-]
-
-# ---------------- SPOTIFY ----------------
-spotify_ctrl = SpotifyController(
-    client_id="YOUR_CLIENT_ID",
-    client_secret="YOUR_CLIENT_SECRET",
-    redirect_uri="YOUR_REDIRECT_URI"
-)
-
-# ---------------- PLAYER (DUMMY for server) ----------------
-class DummyPlayer:
-    def __init__(self, local_songs=None, spotify_controller=None):
-        self.local_songs = local_songs or []
-        self.spotify_controller = spotify_controller
-        self.current_index = 0
-
-    def play(self): pass
-    def pause(self): pass
-    def next_song(self): pass
-    def prev_song(self): pass
-    def volume_up(self): pass
-    def volume_down(self): pass
-    def like(self): pass
-    def dislike(self): pass
-    def play_spotify(self): pass
-    def stop_spotify(self): pass
-    def next_spotify(self): pass
-    def prev_spotify(self): pass
-
-player = DummyPlayer(local_songs, spotify_ctrl)
-
-player_state = {
-    "mode": "local",
-    "status": "stopped",
-    "song": "",
-    "volume": 50,
-    "liked": None,
-    "voice": False,
-    "gesture": False
-}
-
-voice_status = {"active": False}
-
-# ---------------- BASIC ROUTE ----------------
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def serve_react(path):
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    return send_from_directory(app.template_folder, "index.html")
-
-@app.route("/songs/<path:filename>")
-def serve_song(filename):
-    return send_from_directory(MUSIC_FOLDER, filename)
-
-# ---------------- SONG LIST ----------------
-@app.route("/api/songs", methods=["GET"])
-def get_local_songs():
-    files = os.listdir(MUSIC_FOLDER)
-    songs = [f for f in files if f.endswith(".mp3") or f.endswith(".wav")]
-    return jsonify({"songs": songs})
+@app.route("/api/health")
+def health():
+    return {"status": "ok"}
 
 # ---------------- AUTH ----------------
 @app.route("/api/signup", methods=["POST"])
 def signup():
     data = request.get_json()
+
     username = data.get("username")
     email = data.get("email")
     password = data.get("password")
@@ -110,12 +41,14 @@ def signup():
     user = User(username=username, email=email, password=password)
     db.session.add(user)
     db.session.commit()
-    
+
     return jsonify({"message": "Signup successful"}), 201
+
 
 @app.route("/api/login", methods=["POST"])
 def login():
     data = request.get_json()
+
     email_or_username = data.get("email_or_username")
     password = data.get("password")
 
@@ -124,109 +57,22 @@ def login():
         (User.username == email_or_username)
     ).first()
 
-    if user and user.password == password:
-        return jsonify({"user_id": user.id}), 200
+    if not user:
+        return jsonify({"error": "User not found"}), 404
 
-    return send_from_directory(app.template_folder, "index.html")
+    if user.password != password:
+        return jsonify({"error": "Invalid password"}), 401
+
+    return jsonify({
+        "message": "Login successful",
+        "user_id": user.id
+    }), 200
+
 
 @app.route("/api/logout", methods=["POST"])
 def logout():
     return jsonify({"message": "Logged out"}), 200
 
-@app.route("/api/current_index", methods=["GET"])
-def current_index():
-    return jsonify({"index": player.current_index})
-
-@app.route("/api/state", methods=["GET"])
-def get_state():
-    return jsonify({
-        "mode": player_state["mode"],
-        "status": player_state["status"],
-        "current_index": getattr(player, "current_index", 0),
-        "voice": voice_status.get("active", False),
-        "gesture": False
-    })
-
-# ---------------- VOICE ----------------
-@app.route("/api/voice/start", methods=["POST"])
-def voice_start_route():
-    start_voice()
-    voice_status["active"] = True
-    return {"status":"voice started"}, 200
-
-@app.route("/api/voice/stop", methods=["POST"])
-def voice_stop_route():
-    stop_voice()
-    voice_status["active"] = False
-    return {"status":"voice stopped"}, 200
-
-@app.route("/api/voice_active", methods=["POST"])
-def voice_active():
-    voice_status["active"] = True
-    print("🎤 Voice wake word detected")
-    return {"status": "voice active"}
-
-@app.route("/api/voice_inactive", methods=["POST"])
-def voice_inactive():
-    voice_status["active"] = False
-    return {"active": False}
-
-@app.route("/api/voice_status")
-def get_voice_status():
-    return voice_status
-
-@app.route("/api/spotify/login")
-def spotify_login():
-    auth_url = spotify_ctrl.oauth.get_authorize_url()
-    return redirect(auth_url)
-
-@app.route("/api/spotify/callback")
-def spotify_callback():
-    code = request.args.get("code")
-    token_info = spotify_ctrl.oauth.get_access_token(code)
-    spotify_ctrl.set_token(token_info)
-    return redirect("http://localhost:3000")
-
-@app.route("/api/spotify/play", methods=["POST"])
-def spotify_play():
-    if not spotify_ctrl.is_ready():
-        return jsonify({"error": "Spotify not logged in"}), 401
-    player.play_spotify()
-    player_state["status"] = "playing"
-    player_state["mode"] = "spotify"
-    return jsonify({"message": "Spotify playing"}), 200
-
-@app.route("/api/spotify/stop", methods=["POST"])
-def spotify_stop():
-    if not spotify_ctrl.is_ready():
-        return jsonify({"error": "Spotify not logged in"}), 401
-    player.stop_spotify()
-    player_state["status"] = "paused"
-    player_state["mode"] = "spotify"
-    return jsonify({"message": "Spotify stopped"}), 200
-
-@app.route("/api/spotify/next", methods=["POST"])
-def spotify_next():
-    if not spotify_ctrl.is_ready():
-        return jsonify({"error": "Spotify not logged in"}), 401
-    player.next_spotify()
-    player_state["status"] = "next song"
-    player_state["mode"] = "spotify"
-    return jsonify({"message": "Spotify next"}), 200
-
-@app.route("/api/spotify/prev", methods=["POST"])
-def spotify_prev():
-    if not spotify_ctrl.is_ready():
-        return jsonify({"error": "Spotify not logged in"}), 401
-    player.prev_spotify()
-    player_state["status"] = "previous song"
-    player_state["mode"] = "spotify"
-    return jsonify({"message": "Spotify previous"}), 200
-
-@app.route('/shutdown', methods=['POST'])
-def shutdown():
-    os._exit(0)
-    return "ok"
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
