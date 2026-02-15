@@ -26,7 +26,7 @@ function Login() {
         return;
       }
 
-      localStorage.setItem("user_id", data.user_id);
+      localStorage.setItem("token", data.token);
       navigate("/dashboard");
 
     } catch (err) {
@@ -54,6 +54,18 @@ function Login() {
         />
 
         <button onClick={handleLogin}>Login</button>
+
+        {/* 👇 ADD THIS */}
+        <p style={{ marginTop: "10px" }}>
+          New user?{" "}
+          <span
+            style={{ color: "#6c63ff", cursor: "pointer" }}
+            onClick={() => navigate("/signup")}
+          >
+            Sign Up here
+          </span>
+        </p>
+
       </div>
     </div>
   );

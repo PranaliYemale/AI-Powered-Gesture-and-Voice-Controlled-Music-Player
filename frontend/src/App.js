@@ -3,11 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
-import AnimatedUI from "./components/AnimatedUI";
 
 function App() {
 
-  const isLoggedIn = !!localStorage.getItem("user_id");
+  const isLoggedIn = !!localStorage.getItem("token");
 
   return (
     <BrowserRouter>
@@ -19,15 +18,7 @@ function App() {
 
         <Route
           path="/dashboard"
-          element={
-            isLoggedIn ? (
-              <AnimatedUI>
-                <Dashboard />
-              </AnimatedUI>
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
+          element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />}
         />
 
       </Routes>
